@@ -23,6 +23,7 @@ public class Server {
 	public void start() throws IOException{
 		while (true){
 			connectionToClient = serverSocket.accept();
+			System.out.println("Server started");
 			initializeThread(connectionToClient);
 		}
 	}

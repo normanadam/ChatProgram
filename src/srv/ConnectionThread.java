@@ -12,8 +12,8 @@ public class ConnectionThread extends Thread{
 	private Socket 	connectionToClient = null;
 	private PrintWriter    outStream   = null;
 	private BufferedReader inStream    = null;
-	private ObjectInputStream sInput;
-	private ObjectOutputStream sOutput;
+	ObjectInputStream sInput;
+	ObjectOutputStream sOutput;
 	private String userName;
 
 	public ConnectionThread(Socket s) {

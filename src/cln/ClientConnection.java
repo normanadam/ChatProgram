@@ -16,8 +16,8 @@ public class ClientConnection {
 	private PrintWriter outStream     = null;
 	private BufferedReader inStream   = null;
 	private String userName;
-	private ObjectInputStream sInput;
-	private ObjectOutputStream sOutput;
+	ObjectInputStream sInput;
+	ObjectOutputStream sOutput;
 	
 	public ClientConnection(String serverAddress, int serverPort, String userName) throws IOException{
 		userName = this.userName;
