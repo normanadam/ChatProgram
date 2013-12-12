@@ -7,109 +7,48 @@ import java.io.IOException;
 // import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Server {
 	private ServerSocket serverSocket  = null;
 	private Socket 	connectionToClient = null;
-	// private PrintWriter    outStream   = null;
-	// private BufferedReader inStream    = null;
+	private ArrayList<ConnectionThread> cList;
 
 	// use a ServerSocket to initialize listening 
 	// to the port specified
 	public void init(int port) throws IOException{
-		log("Setting up server socket...");
 		serverSocket = new ServerSocket(port);
-		log("Server socket setup complete.");
 	}
 
-	// waitForConnection will stay in the call to serverSocket.accept()
-	// until a client connects
-	// then it initializes the streams used for communication with the client
-	public void waitForConnection() throws IOException{
+	public void start() throws IOException{
 		while (true){
-			log("Waiting for connections...");
 			connectionToClient = serverSocket.accept();
 			initializeThread(connectionToClient);
-			// outStream = new PrintWriter(new OutputStreamWriter(connectionToClient.getOutputStream()));
-			// inStream  = new BufferedReader(new InputStreamReader(connectionToClient.getInputStream()));
-			log("Connection to client established.");
 		}
 	}
 
 	public void initializeThread(Socket s) {
-		ConnectionThread cT = new ConnectionThread(s);
-		cT.start();
+		ConnectionThread cThread = new ConnectionThread(s);
+		cList.add(cThread);
+		cThread.start();
 	}
 
-	/*
-	// close the streams and the sockets
-	public void close(){
-		log("Closing connection.");
-		try{
-			// log data about connection before closing
-			this.logConnectionInfo();
+	public static void main(String[] args) {
+		Server server = new Server();
 
-			// close and clean up
-			inStream.close();
-			outStream.close();
-			connectionToClient.close();
-			serverSocket.close();
-		}catch(IOException e){
-			logError("Failed to properly close the connection. " + e.getMessage());
-		}
-
-		log("Connection closed.");
-	}
-
-	// write message to the stream going to the client
-	public void send(String message){
-		log("Sending...");
-		outStream.println(message);
-		outStream.flush();
-		log("Message sent.");
-	}
-
-	// echo method
-	// use receive to wait for input from client
-	// when it we get it, use send to echo it back
-	// stop when received message "bye"
-	public void echo(){
-		String in = "";
-		while (!in.equals("bye")){
-			in = receive();
-			send(in);
-		}
-	}
-
-	// read a message from the stream coming in from the client
-	public String receive(){
-		log("Receiving...");
-
-		String receivedMessage = "";
+		// SETUP SERVER
 		try {
-			receivedMessage = inStream.readLine();
-			log("Message received!");
+			server.init(52000);
 		} catch (IOException e) {
-			logError("Receive failed! " + e.getMessage());
+			System.err.println("Failed to setup a server socket. " + e.getMessage());
+			System.exit(1);
 		}
 
-		return receivedMessage;
+		try {
+			server.start();
+		} catch (IOException e) {
+			System.err.println("Failed to setup connection. " + e.getMessage());
+			System.exit(1);
+		}
 	}
-
-	private void logConnectionInfo(){
-		log("Connection info:");
-		System.out.println("\t" + connectionToClient);
-	}
-
-	 */
-
-	private void log(String message){
-		System.out.println("Server: " + message);
-	}
-
-	/*
-	private void logError(String message){
-		System.err.println("Server: " + message);
-	}
-	 */
 }

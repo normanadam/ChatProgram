@@ -3,46 +3,39 @@ package cln;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class ClientConnection implements Runnable {
+public class ClientConnection {
 
 	private Socket connectionToServer = null;
 	private PrintWriter outStream     = null;
 	private BufferedReader inStream   = null;
-
-	public ClientConnection(String serverAddress, int serverPort) throws IOException{
-		log("creating connection...");
+	private String userName;
+	private ObjectInputStream sInput;
+	private ObjectOutputStream sOutput;
+	
+	public ClientConnection(String serverAddress, int serverPort, String userName) throws IOException{
+		userName = this.userName;
+		sInput = new ObjectInputStream(connectionToServer.getInputStream());
+		sOutput = new ObjectOutputStream(connectionToServer.getOutputStream());
+		
 		connect(serverAddress, serverPort);
+		
 	}
 	
 	// set up a connection to a specified server and port
 	public void connect(String serverAddress, int serverPort) throws IOException{
-		log("Connecting to server...");
 
 		//Set up a socket and connect it to our server
 		connectionToServer = new Socket(serverAddress, serverPort);
 		
-		//The getOutputStream and getInputStream methods return byte streams
-		outStream = new PrintWriter(new OutputStreamWriter(connectionToServer.getOutputStream()));
-		inStream  = new BufferedReader(new InputStreamReader(connectionToServer.getInputStream()));
+		sOutput.writeObject(userName);
 
-		log("Connected!");
-	}
-	
-	// set up a connection to a specified server and port
-	// this version using a InetAddress
-	public void connect(InetAddress serverAddress, int serverPort) throws IOException{
-		log("Connecting to server...");
-		//Set up a socket and connect it to our server
-		connectionToServer = new Socket(serverAddress, serverPort);
-		//The getOutputStream and getInputStream methods return byte streams
-		outStream = new PrintWriter(new OutputStreamWriter(connectionToServer.getOutputStream()));
-		inStream  = new BufferedReader(new InputStreamReader(connectionToServer.getInputStream()));
-		log("Connected!");
 	}
 	
 	// close the streams and the socket

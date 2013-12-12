@@ -2,8 +2,8 @@ package srv;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -12,29 +12,35 @@ public class ConnectionThread extends Thread{
 	private Socket 	connectionToClient = null;
 	private PrintWriter    outStream   = null;
 	private BufferedReader inStream    = null;
+	private ObjectInputStream sInput;
+	private ObjectOutputStream sOutput;
+	private String userName;
 
 	public ConnectionThread(Socket s) {
 		connectionToClient = s;
-
+		
+		try {
+			sInput = new ObjectInputStream(connectionToClient.getInputStream());
+			sOutput = new ObjectOutputStream(connectionToClient.getOutputStream());
+			userName = (String) sInput.readObject();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		log("" + userName + " has connected");
+		
 	}
 
 	public void run() {
 
 		try {
-
-			outStream = new PrintWriter(new OutputStreamWriter(connectionToClient.getOutputStream()));
-			inStream  = new BufferedReader(new InputStreamReader(connectionToClient.getInputStream()));
-
-			echo();
-
 		} catch (Exception e){
 			e.printStackTrace();
 		} finally {
 			close();
 		}
-
-
-
 	}
 
 	// close the streams and the sockets
